@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .calculator {
+            background-color: #1e293b;
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 340px;
+        }
+        .display {
+            width: 100%;
+            height: 70px;
+            background-color: #0f172a;
+            border: none;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            padding: 0 16px;
+            font-size: 2rem;
+            color: #f8fafc;
+            text-align: right;
+            outline: none;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        button {
+            padding: 18px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            background-color: #334155;
+            color: #f8fafc;
+        }
+        button:active {
+            opacity: 0.8;
+        }
+        button.operator {
+            background-color: #f97316;
+            color: #ffffff;
+        }
+        button.operator:hover {
+            background-color: #ea580c;
+        }
+        button.clear {
+            background-color: #ef4444;
+            color: #ffffff;
+        }
+        button.clear:hover {
+            background-color: #dc2626;
+        }
+        button.equal {
+            background-color: #22c55e;
+            color: #ffffff;
+            grid-column: span 2;
+        }
+        button.equal:hover {
+            background-color: #16a34a;
+        }
+        button:hover {
+            background-color: #475569;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator">
+    <input type="text" class="display" id="screen" readonly value="0">
+    <div class="buttons">
+        <button class="clear" onclick="clearScreen()">C</button>
+        <button onclick="backspace()">&larr;</button>
+        <button class="operator" onclick="appendValue('/')">&divide;</button>
+        <button class="operator" onclick="appendValue('*')">&times;</button>
+        
+        <button onclick="appendValue('7')">7</button>
+        <button onclick="appendValue('8')">8</button>
+        <button onclick="appendValue('9')">9</button>
+        <button class="operator" onclick="appendValue('-')">&minus;</button>
+        
+        <button onclick="appendValue('4')">4</button>
+        <button onclick="appendValue('5')">5</button>
+        <button onclick="appendValue('6')">6</button>
+        <button class="operator" onclick="appendValue('+')">+</button>
+        
+        <button onclick="appendValue('1')">1</button>
+        <button onclick="appendValue('2')">2</button>
+        <button onclick="appendValue('3')">3</button>
+        <button onclick="appendValue('.')">.</button>
+        
+        <button onclick="appendValue('0')">0</button>
+        <button class="equal" onclick="calculate()">=</button>
+    </div>
+</div>
+
+<script>
+    const screen = document.getElementById('screen');
+    let shouldReset = false;
+
+    function appendValue(val) {
+        if (screen.value === '0' && val !== '.' || shouldReset) {
+            if (shouldReset && ['+', '-', '*', '/'].includes(val)) {
+                shouldReset = false;
+            } else {
+                screen.value = '';
+                shouldReset = false;
+            }
+        }
+        screen.value += val;
+    }
+
+    function clearScreen() {
+        screen.value = '0';
+        shouldReset = false;
+    }
+
+    function backspace() {
+        if (screen.value.length > 1) {
+            screen.value = screen.value.slice(0, -1);
+        } else {
+            screen.value = '0';
+        }
+    }
+
+    function calculate() {
+        try {
+            // Using a basic safe evaluation replacement for basic math symbols
+            let expression = screen.value;
+            if (!expression) return;
+            
+            // Clean consecutive operators or trailing operators safely before evaluation
+            let result = Function('"use strict";return (' + expression + ')')();
+            screen.value = Number(result.toFixed(8)).toString(); // Avoid long float decimals
+            shouldReset = true;
+        } catch (error) {
+            screen.value = 'Error';
+            shouldReset = true;
+        }
+    }
+</script>
+
+</body>
+</html>
